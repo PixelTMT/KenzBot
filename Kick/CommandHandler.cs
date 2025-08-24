@@ -2,14 +2,13 @@
 using KickLib;
 using KickLib.Api.Interfaces;
 using KickLib.Client.Models.Args;
-using System.Linq;
 
-public class CommandHandler
+public static class CommandHandler
 {
-    public readonly Dictionary<string, Func<ChatMessageEventArgs, string[], Task>> Commands
+    public static readonly Dictionary<string, Func<ChatMessageEventArgs, string[], Task>> Commands
         = new(StringComparer.OrdinalIgnoreCase);
 
-    public void RegisterCommand(string name, Func<ChatMessageEventArgs, string[], Task> action)
+    public static void RegisterCommand(string name, Func<ChatMessageEventArgs, string[], Task> action)
     {
         if (!Commands.ContainsKey(name))
         {
@@ -22,7 +21,7 @@ public class CommandHandler
         }
     }
 
-    public async Task HandleCommand(ChatMessageEventArgs e, IChat chatClient)
+    public static async Task HandleCommand(ChatMessageEventArgs e, IChat chatClient)
     {
         string message = e.Data.Content.Trim();
 
@@ -52,7 +51,7 @@ public class CommandHandler
             //Console.WriteLine($"❌ Unknown command: {commandName}");
         }
     }
-    public async Task HandleSO(ChatMessageEventArgs e, IKickApi chatAPI, JsonSO shoutOutJson)
+    public static async Task HandleSO(ChatMessageEventArgs e, IKickApi chatAPI, JsonSO shoutOutJson)
     {
         string message = e.Data.Content.Trim();
         //bool isVerified = e.Data.Sender.Identity.Badges.Select((x) => x.Text).ToArray().Contains("Verified channel");
@@ -80,16 +79,6 @@ public class CommandHandler
                         shoutOutJson.history.Add(history);
                     }
                     var soMSG = await chatAPI.Chat.SendMessageAsBotAsync(shoutoutMSG);
-                    JsonSO.History_SO history = new()
-                    {
-                        name = e.Data.Sender.Username,
-                        url = $"https://kick.com/{channel.Value.Slug}"
-                    };
-                    if (!shoutOutJson.History.Contains(history))
-                    {
-                        shoutOutJson.History.Add(history);
-                    }
-
                     if (soMSG.IsSuccess)
                     {
                         await shoutOutJson.SaveToFile();
@@ -103,11 +92,11 @@ public class CommandHandler
         }
         catch (Exception ex)
         {
-            Console.Write($"HandleSO Error: {ex.StackTrace}");
-            //await KenzKickMain.RefreshToken();
+            Console.Write($"HandleSO Error: {ex.Message}");
+            await KenzKickMain.RefreshToken();
         }
     }
-    public async Task HandleBanUsernameContain(ChatMessageEventArgs e, int broadcasterID, IKickApi chatAPI, JsonBanned banContain)
+    public static async Task HandleBanUsernameContain(ChatMessageEventArgs e, int broadcasterID, IKickApi chatAPI, JsonBanned banContain)
     {
         try
         {
@@ -123,11 +112,11 @@ public class CommandHandler
         }
         catch (Exception ex)
         {
-            Console.Write($"Error ban user: {ex.StackTrace}");
-            //await KenzKickMain.RefreshToken();
+            Console.Write($"Error ban user: {ex.Message}");
+            await KenzKickMain.RefreshToken();
         }
     }
-    public async Task HandleBanWordContain(ChatMessageEventArgs e, int broadcasterID, IKickApi chatAPI, JsonBanned banContain)
+    public static async Task HandleBanWordContain(ChatMessageEventArgs e, int broadcasterID, IKickApi chatAPI, JsonBanned banContain)
     {
         try
         {
@@ -143,8 +132,8 @@ public class CommandHandler
         }
         catch (Exception ex)
         {
-            Console.Write($"Error ban word: {ex.StackTrace}");
-            //await KenzKickMain.RefreshToken();
+            Console.Write($"Error ban word: {ex.Message}");
+            await KenzKickMain.RefreshToken();
         }
     }
 }

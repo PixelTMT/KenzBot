@@ -8,7 +8,6 @@ namespace KenzBot
         {
             List<Task> Bots = new();
             Bots.Add(KenzKickMain.MainProgram(args));
-            //Bots.Add(DiscordBot.RunMain(args));
 
             await Task.WhenAll(Bots);
         }
